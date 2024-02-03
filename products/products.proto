@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package products;
+
+service ProductsService {
+    rpc GetProductsByIds(GetProductsByIdsInput) returns (GetProductsByIdsOutput) {}
+}
+
+message Product {
+    string id = 1;
+    string name = 4;
+    int32 stock = 2;
+    double price = 3;
+}
+
+message GetProductsByIdsInput {
+    repeated string ids = 1;
+}
+
+message GetProductsByIdsOutput {
+    repeated Product products = 1;
+}

@@ -4,7 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "tsx watch server.ts"
+    "start:http": "tsx watch server.ts",
+    "start:grpc": "tsx watch grpc.ts"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.4.0",

@@ -13,23 +13,27 @@ server.use(morgan('dev'));
 
 server.post('/orders', async (request, response) => {
   const items = request.body.items as { id: string; amount: number }[];
-  const products = await productsGateway.fetchProducts(items.map((item) => item.id));
+  const products = await productsGateway.grpc.fetchProducts(items.map((item) => item.id));
   const order: Order = {
     id: randomUUID(),
-    items: products.map((product: any) => {
-      const amount = items.find((item) => item.id === product.id)?.amount;
+    items: products.map((product) => {
+      const amount = items.find((item) => item.id === product.id)?.amount || 0;
       return { id: product.id, amount, price: product.price, name: product.name };
     }),
     total: items.reduce((total, item) => {
-      const product = products.find((product: any) => product.id === item.id);
-      const priceTotal = product.price * item.amount;
+      const product = products.find((product) => product.id === item.id);
+      const priceTotal = product?.price ?? 0 * item.amount;
       return total + priceTotal;
     }, 0),
     created_at: new Date(),
   };
   db.saveOrder(order);
-  await productsGateway.orderProducts(items);
+  await productsGateway.grpc.orderProducts(items);
   return response.sendStatus(201);
+});
+
+server.get('/orders', (_, response) => {
+  return response.json({ order: db.listOrders() });
 });
 
 server.use((error: any, __: Request, response: Response, _: NextFunction) => {
